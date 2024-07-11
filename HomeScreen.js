@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios"; 
+import axios from "axios";
+import { DrawerLayout } from "react-native-gesture-handler";
 import Menu from "./assets/Menu.png";
 import Logo from "./assets/Logo.png";
 import Search from "./assets/Search.png";
@@ -20,6 +21,7 @@ import add_circle from "./assets/add_circle.png";
 const HomeScreen = ({ navigation }) => {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
+  const drawer = React.useRef(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -58,53 +60,77 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Image source={Menu} />
-        <View style={styles.logo}>
-          <Image source={Logo} />
-        </View>
-        <View style={styles.searchContainer}>
-          <TouchableOpacity>
-            <Image source={Search} styles={styles.searchButton} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("Cart", { cart })}>
-            <Image source={shoppingBag} />
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View style={styles.storyContainer}>
-        <Text style={styles.storyText}>OUR STORY</Text>
-        <View style={styles.actionContainer}>
-          <View style={styles.actionBackgroundList}>
-            <Image source={Listview} style={styles.listImage} />
-          </View>
-          <View style={styles.actionBackground}>
-            <Image source={Filter} style={styles.filterImage} />
-          </View>
-        </View>
-      </View>
+  const renderDrawerContent = () => (
+    <View style={styles.menu}>
+      <TouchableOpacity onPress={() => drawer.current.closeDrawer()}>
+        <Text style={styles.closeButton}>X</Text>
+      </TouchableOpacity>
+      <Text style={styles.menuItem}>Store</Text>
+      <Text style={styles.menuItem}>Locations</Text>
+      <Text style={styles.menuItem}>Blog</Text>
+      <Text style={styles.menuItem}>Jewelry</Text>
+      <Text style={styles.menuItem}>Electronic</Text>
+      <Text style={styles.menuItem}>Clothing</Text>
+    </View>
+  );
 
-      <FlatList
-        data={products}
-        keyExtractor={(item) => item.id.toString()}
-        numColumns={2}
-        renderItem={({ item }) => (
-          <View style={styles.product}>
-            <Image source={{ uri: item.image }} style={styles.image} />
-            <View style={styles.description}>
-              <Text style={styles.itemType}>{item.title}</Text>
-              <Text style={styles.itemName}>{item.description}</Text>
-              <Text style={styles.itemPrice}>${item.price}</Text>
-            </View>
-            <TouchableOpacity style={styles.addIconContainer} onPress={() => addToCart(item)}>
-              <Image source={add_circle} style={styles.addIcon} />
+  return (
+    <DrawerLayout
+      ref={drawer}
+      drawerWidth={300}
+      drawerPosition="left"
+      drawerType="slide"
+      renderNavigationView={renderDrawerContent}
+    >
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => drawer.current.openDrawer()}>
+            <Image source={Menu} />
+          </TouchableOpacity>
+          <View style={styles.logo}>
+            <Image source={Logo} />
+          </View>
+          <View style={styles.searchContainer}>
+            <TouchableOpacity>
+              <Image source={Search} styles={styles.searchButton} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("Cart", { cart })}>
+              <Image source={shoppingBag} />
             </TouchableOpacity>
           </View>
-        )}
-      />
-    </View>
+        </View>
+        <View style={styles.storyContainer}>
+          <Text style={styles.storyText}>OUR STORY</Text>
+          <View style={styles.actionContainer}>
+            <View style={styles.actionBackgroundList}>
+              <Image source={Listview} style={styles.listImage} />
+            </View>
+            <View style={styles.actionBackground}>
+              <Image source={Filter} style={styles.filterImage} />
+            </View>
+          </View>
+        </View>
+
+        <FlatList
+          data={products}
+          keyExtractor={(item) => item.id.toString()}
+          numColumns={2}
+          renderItem={({ item }) => (
+            <View style={styles.product}>
+              <Image source={{ uri: item.image }} style={styles.image} />
+              <View style={styles.description}>
+                <Text style={styles.itemType}>{item.title}</Text>
+                <Text style={styles.itemName}>{item.description}</Text>
+                <Text style={styles.itemPrice}>${item.price}</Text>
+              </View>
+              <TouchableOpacity style={styles.addIconContainer} onPress={() => addToCart(item)}>
+                <Image source={add_circle} style={styles.addIcon} />
+              </TouchableOpacity>
+            </View>
+          )}
+        />
+      </View>
+    </DrawerLayout>
   );
 };
 
@@ -136,7 +162,7 @@ const styles = StyleSheet.create({
   product: {
     flex: 1,
     margin: 10,
-    marginBottom: -45, 
+    marginBottom: -45,
   },
   image: {
     width: "100%",
@@ -200,6 +226,21 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 115,
     right: 5,
+  },
+  menu: {
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 20,
+  },
+  closeButton: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'left',
+    marginBottom: 20,
+  },
+  menuItem: {
+    fontSize: 20,
+    marginVertical: 10,
   },
 });
 
