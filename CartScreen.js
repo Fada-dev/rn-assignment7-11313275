@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -8,22 +8,38 @@ import {
   TouchableOpacity,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import remove from "./assets/remove.png";
+import axios from "axios";
+import { DrawerLayout, PanGestureHandler } from "react-native-gesture-handler";
+import Menu from "./assets/Menu.png";
 import Logo from "./assets/Logo.png";
 import Search from "./assets/Search.png";
-import underline from './assets/underline.png';
-import shoppingB from "./assets/shoppingB.png";
+import shoppingBag from "./assets/shoppingBag.png";
+import Listview from "./assets/Listview.png";
+import Filter from "./assets/Filter.png";
+import add_circle from "./assets/add_circle.png";
 
-const CartScreen = ({ route, navigation }) => {
-  const { cart } = route.params;
-  const [cartItems, setCartItems] = useState(cart);
+const HomeScreen = ({ navigation }) => {
+  const [products, setProducts] = useState([]);
+  const [cart, setCart] = useState([]);
+  const drawer = useRef(null);
 
   useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get("https://fakestoreapi.com/products");
+        setProducts(response.data);
+      } catch (error) {
+        console.error("Failed to fetch products from API", error);
+      }
+    };
+
+    fetchProducts();
+
     const loadCart = async () => {
       try {
         const storedCart = await AsyncStorage.getItem("cart");
         if (storedCart) {
-          setCartItems(JSON.parse(storedCart));
+          setCart(JSON.parse(storedCart));
         }
       } catch (error) {
         console.error("Failed to load cart from local storage", error);
@@ -33,168 +49,201 @@ const CartScreen = ({ route, navigation }) => {
     loadCart();
   }, []);
 
-  const removeFromCart = async (product) => {
-    const updatedCart = cartItems.filter((item) => item.id !== product.id);
-    setCartItems(updatedCart);
+  const addToCart = async (product) => {
+    const updatedCart = [...cart, product];
+    setCart(updatedCart);
 
     try {
       await AsyncStorage.setItem("cart", JSON.stringify(updatedCart));
     } catch (error) {
-      console.error("Failed to update cart in local storage", error);
+      console.error("Failed to save cart to local storage", error);
     }
   };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Image source={Logo} />
-        <Image source={Search} style={styles.searchIcon} />
-      </View>
-      <View style={styles.checkContainer}>
-        <Text style={styles.checkText}>Checkout</Text>
-        <Image source={underline} style={styles.undelineImg} />
-      </View>
-
-      <FlatList
-        data={cartItems}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.product}>
-            <Image source={item.image} style={styles.image} />
-            <View style={styles.cartDescription}>
-              <Text style={styles.itemType}>{item.name}</Text>
-              <Text style={styles.itemName}>{item.description}</Text>
-              <Text style={styles.itemPrice}>{item.price}</Text>
-            </View>
-            <TouchableOpacity
-              onPress={() => removeFromCart(item)}
-              style={styles.removeIcon}
-            >
-              <Image source={remove} />
-            </TouchableOpacity>
-          </View>
-        )}
-      />
-      <View style={styles.footer}>
-        <View style={styles.estTotal}>
-          <Text style={styles.totalRow}> EST. TOTAL</Text>
-          <Text style={styles.totalAmount}>$ 240</Text>
-        </View>
-        <View style={styles.footerCheckout}>
-          <Image source={shoppingB} style={styles.shopBag} />
-          <Text style={styles.checkName}>CHECKOUT</Text>
-        </View>
-      </View>
+  const renderDrawerContent = () => (
+    <View style={styles.menu}>
+      <TouchableOpacity onPress={() => drawer.current.closeDrawer()}>
+        <Text style={styles.closeButton}>X</Text>
+      </TouchableOpacity>
+      <Text style={styles.menuItem}>Store</Text>
+      <Text style={styles.menuItem}>Locations</Text>
+      <Text style={styles.menuItem}>Blog</Text>
+      <Text style={styles.menuItem}>Jewelry</Text>
+      <Text style={styles.menuItem}>Electronic</Text>
+      <Text style={styles.menuItem}>Clothing</Text>
     </View>
+  );
+
+  return (
+    <DrawerLayout
+      ref={drawer}
+      drawerWidth={300}
+      drawerPosition="left"
+      drawerType="slide"
+      renderNavigationView={renderDrawerContent}
+    >
+      <PanGestureHandler onGestureEvent={() => drawer.current.openDrawer()}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => drawer.current.openDrawer()}>
+              <Image source={Menu} />
+            </TouchableOpacity>
+            <View style={styles.logo}>
+              <Image source={Logo} />
+            </View>
+            <View style={styles.searchContainer}>
+              <TouchableOpacity>
+                <Image source={Search} styles={styles.searchButton} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => navigation.navigate("Cart", { cart })}>
+                <Image source={shoppingBag} />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.storyContainer}>
+            <Text style={styles.storyText}>OUR STORY</Text>
+            <View style={styles.actionContainer}>
+              <View style={styles.actionBackgroundList}>
+                <Image source={Listview} style={styles.listImage} />
+              </View>
+              <View style={styles.actionBackground}>
+                <Image source={Filter} style={styles.filterImage} />
+              </View>
+            </View>
+          </View>
+
+          <FlatList
+            data={products}
+            keyExtractor={(item) => item.id.toString()}
+            numColumns={2}
+            renderItem={({ item }) => (
+              <View style={styles.product}>
+                <Image source={{ uri: item.image }} style={styles.image} />
+                <View style={styles.description}>
+                  <Text style={styles.itemType}>{item.title}</Text>
+                  <Text style={styles.itemName}>{item.description}</Text>
+                  <Text style={styles.itemPrice}>${item.price}</Text>
+                </View>
+                <TouchableOpacity style={styles.addIconContainer} onPress={() => addToCart(item)}>
+                  <Image source={add_circle} style={styles.addIcon} />
+                </TouchableOpacity>
+              </View>
+            )}
+          />
+        </View>
+      </PanGestureHandler>
+    </DrawerLayout>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // padding: 10,
+    padding: 10,
   },
-  headerContainer: {
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 10,
+    position: "relative",
+  },
+  searchButton: {
+    position: "absolute",
+    borderWidth: 1,
+  },
+  searchContainer: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "center",
-    right: -10,
-    marginTop: 10,
+    width: 70,
+    justifyContent: "space-between",
   },
-  searchIcon: {
-    position: "relative",
-    left: 130,
-  },
-  checkContainer: {
+  logo: {
     display: "flex",
-    justifyContent: "center",
-    marginTop: 30,
-    marginBottom: 30,
+    left: 20,
   },
-  checkText: {
-    textTransform: "uppercase",
-    textAlign: "center",
+  product: {
+    flex: 1,
+    margin: 10,
+    marginBottom: -45,
+  },
+  image: {
+    width: "100%",
+    height: 300,
+    marginBottom: 10,
+    objectFit: 'contain'
+  },
+  storyContainer: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    margin: 10,
+  },
+  storyText: {
     fontSize: 24,
     fontFamily: "Arial",
     letterSpacing: 6,
   },
-  undelineImg: {
-    width: 198,
-    height: 15,
-    position: "absolute",
-    top: 28,
-    left: 104,
-    opacity: 0.4,
+  actionContainer: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "auto",
   },
-    product: {
-      padding: 10,
-      alignItems: "center",
-      flexDirection: "row",
-      marginLeft: 10
-    },
-    image: {
-      objectFit: 'contain',
-      marginBottom: 10,
-    },
-    cartDescription: {
-      display: "flex",
-      flexDirection: "column",
-      marginLeft: 10,
-      fontFamily: 'Arial',
-    },
-    itemType: {
-      fontSize: 20,
-      fontFamily: "Arial",
-      lineHeight: 20,
-      textTransform: 'uppercase'
-    },
+  description: {
+    position: 'relative',
+    top: -30
+  },
+  actionBackground: {
+    width: 40,
+    height: 40,
+    borderRadius: 30,
+    backgroundColor: "#ECECEC",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  actionBackgroundList: {
+    width: 40,
+    height: 40,
+    borderRadius: 30,
+    backgroundColor: "#ECECEC",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+  },
+  itemType: {
+    fontSize: 16,
+    fontFamily: "Arial",
+    lineHeight: 20,
+  },
   itemName: {
     fontSize: 13,
     color: "gray",
-    lineHeight: 35,
-    textTransform: "capitalize",
+    lineHeight: 20,
   },
   itemPrice: {
     fontSize: 20,
     color: "#FFB668",
   },
-  removeIcon: {
-    position: "relative",
-    top: 50,
+  addIconContainer: {
+    position: "absolute",
+    bottom: 115,
+    right: 5,
   },
-  estTotal: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginLeft: 10,
-    marginTop: 20,
+  menu: {
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 20,
   },
-  totalRow: {
+  closeButton: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'left',
+    marginBottom: 20,
+  },
+  menuItem: {
     fontSize: 20,
-    fontFamily: "Arial",
-  },
-  totalAmount: {
-    fontSize: 20,
-    color: "#FFB668",
-    left: -10,
-  },
-  footerCheckout: {
-    width: "100%",
-    height: 40,
-    backgroundColor: "black",
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-  },
-  checkName: {
-    color: "white",
-    fontSize: 16,
-    fontFamily: "Arial",
-  },
-  shopBag: {
-    width: 18,
-    left: -15,
+    marginVertical: 10,
   },
 });
 
-export default CartScreen;
+export default HomeScreen;
