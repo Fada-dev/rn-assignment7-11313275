@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
+import { useNavigation } from '@react-navigation/native';
 import doNotBleach from "./assets/Do Not Bleach.png";
 import doNotTumbleDry from "./assets/Do Not Tumble Dry.png";
 import dryClean from "./assets/Do Not Wash.png";
@@ -17,17 +18,18 @@ import shoppingBag from "./assets/shoppingBag.png";
 import Menu from "./assets/Menu.png";
 import shipping from "./assets/Shipping.png";
 import Up from "./assets/Up.png";
-import Plus from './assets/Plus.png'
-
+import Plus from './assets/Plus.png';
+import Heart from './assets/Heart.png';
 import backIcon from "./assets/Backward.png";
 
 const ProductDetailScreen = ({ route }) => {
   const { product } = route.params;
+  const navigation = useNavigation();
 
   return (
     <View style={styles.containerOverall}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => drawer.current.openDrawer()}>
+        <TouchableOpacity onPress={() => navigation.openDrawer()}>
           <Image source={Menu} />
         </TouchableOpacity>
         <View style={styles.logo}>
@@ -37,9 +39,7 @@ const ProductDetailScreen = ({ route }) => {
           <TouchableOpacity>
             <Image source={Search} styles={styles.searchButton} />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("Cart", { cart })}
-          >
+          <TouchableOpacity onPress={() => navigation.navigate("Cart")}>
             <Image source={shoppingBag} />
           </TouchableOpacity>
         </View>
@@ -85,11 +85,25 @@ const ProductDetailScreen = ({ route }) => {
           <Text style={styles.deliveryText}>09/11/2021 - 12/11/2021.</Text>
         </View>
       </ScrollView>
+
+      <View style={styles.footer}>
+        <TouchableOpacity style={styles.addToBasketButton}>
+          <Image source={Plus} style={styles.plusIcon} />
+          <Text style={styles.addToBasketText}>ADD TO BASKET</Text>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Image source={Heart} style={styles.heartIcon} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  containerOverall: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
   container: {
     flexGrow: 1,
     padding: 20,
@@ -123,7 +137,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    // fontWeight: 'bold',
     marginBottom: 10,
   },
   price: {
@@ -133,7 +146,6 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    // fontWeight: 'bold',
     marginBottom: 10,
     letterSpacing: 2,
   },
@@ -144,10 +156,8 @@ const styles = StyleSheet.create({
   },
   iconRow: {
     flexDirection: 'column',
-    // justifyContent: 'center',
     marginTop: 0,
     width: "100%",
-    // marginBottom: -10,
   },
   iconContainer: {
     alignItems: "left",
@@ -166,12 +176,12 @@ const styles = StyleSheet.create({
     display: "flex",
     top: 7,
     left: 10,
-    color: 'gray'
+    color: 'gray',
   },
   freeShipContainer: {
     borderTopWidth: 2,
     borderColor: "#e6e1D3",
-    marginTop: 10
+    marginTop: 10,
   },
   shippingText: {
     fontSize: 16,
@@ -192,6 +202,32 @@ const styles = StyleSheet.create({
     marginTop: 20,
     justifyContent: "space-between",
     marginBottom: 10,
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#000",
+    padding: 20,
+    alignItems: "center",
+  },
+  addToBasketButton: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  addToBasketText: {
+    color: "#fff",
+    fontSize: 16,
+    marginLeft: 10,
+  },
+  plusIcon: {
+    width: 20,
+    height: 20,
+    tintColor: "#fff",
+  },
+  heartIcon: {
+    width: 20,
+    height: 20,
+    tintColor: "#fff",
   },
 });
 
