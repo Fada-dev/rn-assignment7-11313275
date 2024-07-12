@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { DrawerLayout, PanGestureHandler } from "react-native-gesture-handler";
+import { DrawerLayout } from "react-native-gesture-handler";
 import Menu from "./assets/Menu.png";
 import Logo from "./assets/Logo.png";
 import Search from "./assets/Search.png";
@@ -65,7 +65,7 @@ const HomeScreen = ({ navigation }) => {
       <TouchableOpacity onPress={() => drawer.current.closeDrawer()}>
         <Text style={styles.closeButton}>X</Text>
       </TouchableOpacity>
-      <Text style={styles.menuItemName}>Fada - Dev </Text>
+      <Text style={styles.menuItemName}>Fada - Dev</Text>
       <Text style={styles.menuItem}>Store</Text>
       <Text style={styles.menuItem}>Locations</Text>
       <Text style={styles.menuItem}>Blog</Text>
@@ -83,59 +83,57 @@ const HomeScreen = ({ navigation }) => {
       drawerType="slide"
       renderNavigationView={renderDrawerContent}
     >
-      <PanGestureHandler onGestureEvent={() => drawer.current.openDrawer()}>
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => drawer.current.openDrawer()}>
-              <Image source={Menu} />
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => drawer.current.openDrawer()}>
+            <Image source={Menu} />
+          </TouchableOpacity>
+          <View style={styles.logo}>
+            <Image source={Logo} />
+          </View>
+          <View style={styles.searchContainer}>
+            <TouchableOpacity>
+              <Image source={Search} styles={styles.searchButton} />
             </TouchableOpacity>
-            <View style={styles.logo}>
-              <Image source={Logo} />
-            </View>
-            <View style={styles.searchContainer}>
-              <TouchableOpacity>
-                <Image source={Search} styles={styles.searchButton} />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigation.navigate("Cart", { cart })}>
-                <Image source={shoppingBag} />
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity onPress={() => navigation.navigate("Cart", { cart })}>
+              <Image source={shoppingBag} />
+            </TouchableOpacity>
           </View>
-          <View style={styles.storyContainer}>
-            <Text style={styles.storyText}>OUR STORY</Text>
-            <View style={styles.actionContainer}>
-              <View style={styles.actionBackgroundList}>
-                <Image source={Listview} style={styles.listImage} />
-              </View>
-              <View style={styles.actionBackground}>
-                <Image source={Filter} style={styles.filterImage} />
-              </View>
-            </View>
-          </View>
-
-          <FlatList
-            data={products}
-            keyExtractor={(item) => item.id.toString()}
-            numColumns={2}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.product}
-                onPress={() => navigation.navigate('ProductDetail', { product: item })}
-              >
-                <Image source={{ uri: item.image }} style={styles.image} />
-                <View style={styles.description}>
-                  <Text style={styles.itemType}>{item.title}</Text>
-                  <Text style={styles.itemName}>{item.description}</Text>
-                  <Text style={styles.itemPrice}>${item.price}</Text>
-                </View>
-                <TouchableOpacity style={styles.addIconContainer} onPress={() => addToCart(item)}>
-                  <Image source={add_circle} style={styles.addIcon} />
-                </TouchableOpacity>
-              </TouchableOpacity>
-            )}
-          />
         </View>
-      </PanGestureHandler>
+        <View style={styles.storyContainer}>
+          <Text style={styles.storyText}>OUR STORY</Text>
+          <View style={styles.actionContainer}>
+            <View style={styles.actionBackgroundList}>
+              <Image source={Listview} style={styles.listImage} />
+            </View>
+            <View style={styles.actionBackground}>
+              <Image source={Filter} style={styles.filterImage} />
+            </View>
+          </View>
+        </View>
+
+        <FlatList
+          data={products}
+          keyExtractor={(item) => item.id.toString()}
+          numColumns={2}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.product}
+              onPress={() => navigation.navigate('ProductDetail', { product: item })}
+            >
+              <Image source={{ uri: item.image }} style={styles.image} />
+              <View style={styles.description}>
+                <Text style={styles.itemType}>{item.title}</Text>
+                <Text style={styles.itemName}>{item.description}</Text>
+                <Text style={styles.itemPrice}>${item.price}</Text>
+              </View>
+              <TouchableOpacity style={styles.addIconContainer} onPress={() => addToCart(item)}>
+                <Image source={add_circle} style={styles.addIcon} />
+              </TouchableOpacity>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
     </DrawerLayout>
   );
 };

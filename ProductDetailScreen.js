@@ -42,6 +42,5 @@ const styles = StyleSheet.create({
     color: '#FFB668',
   },
 });
-                                                                                                                                                                                                                                                                                                                                                   
+
 export default ProductDetailScreen;
-                                                     
