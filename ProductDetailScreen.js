@@ -20,6 +20,7 @@ import shipping from "./assets/Shipping.png";
 import Up from "./assets/Up.png";
 import Plus from './assets/Plus.png';
 import Heart from './assets/Heart.png';
+import Export from './assets/Export.png'
 import backIcon from "./assets/Backward.png";
 
 const ProductDetailScreen = ({ route }) => {
@@ -47,7 +48,10 @@ const ProductDetailScreen = ({ route }) => {
 
       <ScrollView contentContainerStyle={styles.container}>
         <Image source={{ uri: product.image }} style={styles.image} />
+        <View style={styles.ExportTitle}>
         <Text style={styles.title}>{product.title}</Text>
+        <Image source={Export} />
+        </View>
         <Text style={styles.price}>${product.price}</Text>
         <Text style={styles.sectionTitle}>MATERIALS</Text>
         <Text style={styles.description}>{product.description}</Text>
@@ -138,6 +142,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     marginBottom: 10,
+  },
+  ExportTitle: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
   },
   price: {
     fontSize: 20,
