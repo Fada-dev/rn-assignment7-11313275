@@ -21,7 +21,6 @@ import Up from "./assets/Up.png";
 import Plus from './assets/Plus.png';
 import Heart from './assets/Heart.png';
 import Export from './assets/Export.png'
-import backIcon from "./assets/Backward.png";
 
 const ProductDetailScreen = ({ route }) => {
   const { product } = route.params;

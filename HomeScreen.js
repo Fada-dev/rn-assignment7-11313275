@@ -17,6 +17,7 @@ import shoppingBag from "./assets/shoppingBag.png";
 import Listview from "./assets/Listview.png";
 import Filter from "./assets/Filter.png";
 import add_circle from "./assets/add_circle.png";
+import Close from './assets/Close.png'
 
 const HomeScreen = ({ navigation }) => {
   const [products, setProducts] = useState([]);
@@ -63,9 +64,11 @@ const HomeScreen = ({ navigation }) => {
   const renderDrawerContent = () => (
     <View style={styles.menu}>
       <TouchableOpacity onPress={() => drawer.current.closeDrawer()}>
-        <Text style={styles.closeButton}>X</Text>
+      <Image source={Close} />
       </TouchableOpacity>
-      <Text style={styles.menuItemName}>Fada - Dev</Text>
+      <View style={styles.UserName}>
+      <Text style={styles.menuItemName}>FADA - DEV</Text>
+      </View>
       <Text style={styles.menuItem}>Store</Text>
       <Text style={styles.menuItem}>Locations</Text>
       <Text style={styles.menuItem}>Blog</Text>
@@ -247,10 +250,15 @@ const styles = StyleSheet.create({
     marginVertical: 15,
   },
   menuItemName: {
-    fontSize: 20,
+    fontSize: 18,
     marginVertical: 10,
+
+  },
+  UserName: {
     borderBottomWidth: 2,
-    borderBottomColor: 'red'
+    borderColor: '#FFB668',
+    maxWidth: 100,
+    marginTop: 20
   }
 });
 
